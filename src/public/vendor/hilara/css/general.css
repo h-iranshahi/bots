@@ -1,0 +1,55 @@
+
+/* Your CSS for Loading Animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loadable:after {
+    position: relative;
+}
+
+.loadable:after {
+    content: '';
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    border-top-color: transparent;
+    position: absolute;
+    left: 14px;
+    top: 14px;
+    margin: 0 !important;
+    animation: spin 1s linear infinite;
+    display: none;
+}
+
+.loadable.loading:after {
+    display: block;
+}
+
+
+.requesting{
+    position: relative;
+    opacity: 50%;
+}
+.cover{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 99999;
+    background: rgb(255 255 255 / 60%);
+    display: none;
+}
+.requesting .cover{
+    display: block;
+    cursor: progress;
+}
+
+.toast--error {
+    color: #a94442;
+    background-color: #ffecec;
+    border-color: #ff7267;
+}

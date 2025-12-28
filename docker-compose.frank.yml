@@ -1,0 +1,65 @@
+version: "3.9"
+
+services:
+  traefik:
+    image: traefik:v3
+    container_name: traefik
+    restart: always
+    command:
+      - "--log.level=DEBUG"
+      - "--accesslog=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--certificatesresolvers.le.acme.email=h.iranshahi67@gmail.com"
+      - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.le.acme.tlschallenge=true"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/acme.json:/letsencrypt/acme.json
+    networks:
+      - web
+
+  app:
+    build: .
+    container_name: bots_app
+    restart: always
+    volumes:
+      - ./src:/app
+      - ./Caddyfile:/etc/frankenphp/Caddyfile
+    working_dir: /app
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
+      - "traefik.http.routers.bots.rule=Host(`bots.developerz.ir`)"
+      - "traefik.http.routers.bots.entrypoints=websecure"
+      - "traefik.http.routers.bots.tls.certresolver=le"
+      - "traefik.http.services.bots.loadbalancer.server.port=80"
+    networks:
+      - web
+
+  mysql:
+    image: mariadb:10.11
+    container_name: bots_mysql
+    restart: always
+    ports:
+      - "13306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: rootsecret
+      MYSQL_DATABASE: developerz_botmanager
+      MYSQL_USER: developerz_botmanager
+      MYSQL_PASSWORD: uCrqQd5nrHmqnk6m7gdT
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - web
+
+volumes:
+  mysql_data:
+
+networks:
+  web:
